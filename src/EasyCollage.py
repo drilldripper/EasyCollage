@@ -8,6 +8,8 @@ from PyQt5.QtGui import QImage, QPixmap, QBrush
 from PyQt5.QtWidgets import QApplication, QGraphicsView, QGraphicsScene, QFileDialog, \
     QGraphicsEllipseItem, QGraphicsPixmapItem
 
+import cv2
+
 from src.homography import register_by_homography
 
 
@@ -82,6 +84,7 @@ class ImageViewerQt(QGraphicsView):
         self.posArray = []
 
         self.fileName = ''
+        self.transformedImage = ""
 
         # Corresponding points history.
         self.itemHistory = []
@@ -197,7 +200,7 @@ class ImageViewerQt(QGraphicsView):
 
 
 class MainWindow(ImageViewerQt):
-    def __init__(self, mode):
+    def __init__(self):
         super().__init__()
         self.show()
 
@@ -211,7 +214,7 @@ class MainWindow(ImageViewerQt):
         self.targetView.loadImageFromFile()  # Pops up file dialog.
         # Handle left mouse clicks with custom slot.
         self.targetView.leftMouseButtonPressed.connect(handleLeftClick)
-        self.tawgetView.setWindowTitle('Target Image')
+        self.targetView.setWindowTitle('Target Image')
 
         # Show viewer and run application.
         self.referenceView.show()
@@ -229,8 +232,15 @@ class MainWindow(ImageViewerQt):
                                    self.targetView.fileName,
                                    ref_pos, target_pos)
 
+            self.transformedImage = img
             self.loadImageFromFile(filename)
             self.resize(img.shape[1], img.shape[0])
+
+        if key == Qt.Key_S:
+            saveFileName= QFileDialog.getExistingDirectory() + "/result.png"
+            print(saveFileName)
+            cv2.imwrite(saveFileName, self.transformedImage)
+
 
 if __name__ == '__main__':
     import sys
@@ -243,7 +253,7 @@ if __name__ == '__main__':
 
     # Create the application.
     app = QApplication(sys.argv)
-    main = MainWindow("REG")
+    main = MainWindow()
     main.show()
 
     sys.exit(app.exec_())
