@@ -3,15 +3,13 @@
 
 import os
 
-
+import cv2
 from PyQt5.QtCore import Qt, QRectF, pyqtSignal, QPoint
 from PyQt5.QtGui import QImage, QPixmap, QBrush
 from PyQt5.QtWidgets import QApplication, QGraphicsView, QGraphicsScene, QFileDialog, \
-    QGraphicsEllipseItem, QGraphicsPixmapItem,QDesktopWidget
+    QGraphicsEllipseItem, QGraphicsPixmapItem, QDesktopWidget
 
-import cv2
-
-from src.homography import register_by_homography
+from homography import register_by_homography
 
 
 class EllipseItem(QGraphicsEllipseItem):

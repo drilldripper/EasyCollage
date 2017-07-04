@@ -16,8 +16,6 @@ def register_by_homography(ref_img_name, target_img_name, ref_points, target_poi
     target_img = cv2.imread(target_img_name, -1)
     ref_points = np.array(ref_points)
     target_points = np.array(target_points)
-    print(ref_img.shape)
-    print(target_img.shape)
 
     h, status = cv2.findHomography(ref_points, target_points)
     # Warp source image to destination based on homography.
