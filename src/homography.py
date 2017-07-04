@@ -32,7 +32,7 @@ def register_by_homography(ref_img_name, target_img_name, ref_points, target_poi
                 target_img[y][x][1] = out_img[y][x][1]
                 target_img[y][x][2] = out_img[y][x][2]
 
-    file_name = "target.png"
+    file_name = ".target.png"
     cv2.imwrite(file_name, target_img)
     return target_img, file_name
 

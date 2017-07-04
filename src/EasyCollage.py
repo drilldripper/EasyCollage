@@ -1,7 +1,8 @@
 """ Transform image using corresponding points. 
 """
 
-import os.path
+import os
+
 
 from PyQt5.QtCore import Qt, QRectF, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap, QBrush
@@ -187,6 +188,7 @@ class ImageViewerQt(QGraphicsView):
             try:
                 last = self.itemHistory.pop()
                 self.scene.removeItem(last)
+
             except IndexError:
                 print("No items to remove.")
                 return
@@ -206,13 +208,11 @@ class MainWindow(ImageViewerQt):
 
         self.referenceView = ImageViewerQt()
         self.referenceView.loadImageFromFile()  # Pops up file dialog.
-        # Handle left mouse clicks with custom slot.
         self.referenceView.leftMouseButtonPressed.connect(handleLeftClick)
         self.referenceView.setWindowTitle('Reference Image')
 
         self.targetView = ImageViewerQt()
         self.targetView.loadImageFromFile()  # Pops up file dialog.
-        # Handle left mouse clicks with custom slot.
         self.targetView.leftMouseButtonPressed.connect(handleLeftClick)
         self.targetView.setWindowTitle('Target Image')
 
@@ -223,10 +223,15 @@ class MainWindow(ImageViewerQt):
 
     def keyPressEvent(self, event):
         key = event.key()
-        if key == Qt.Key_T:
-            print("T key is pressed")
+
+        if key == Qt.Key_R:
+            print("R Key is pressed")
             ref_pos = self.referenceView.posArray
             target_pos = self.targetView.posArray
+
+            if not len(ref_pos) == len(target_pos):  # Find Homography must have same number points.
+                print("You must select same number points")
+                return
 
             img, filename = register_by_homography(self.referenceView.fileName,
                                    self.targetView.fileName,
@@ -235,7 +240,9 @@ class MainWindow(ImageViewerQt):
             self.transformedImage = img
             self.loadImageFromFile(filename)
             self.resize(img.shape[1], img.shape[0])
+            os.remove(filename)
 
+        # Press S key. Save a transformed image.
         if key == Qt.Key_S:
             saveFileName= QFileDialog.getExistingDirectory() + "/result.png"
             print(saveFileName)
