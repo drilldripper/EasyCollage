@@ -156,10 +156,10 @@ class ImageViewerQt(QGraphicsView):
         if not self.hasImage():
             return
         if len(self.zoomStack) and self.sceneRect().contains(self.zoomStack[-1]):
-            self.fitInView(self.zoomStack[-1], Qt.IgnoreAspectRatio)  # Show zoomed rect (ignore aspect ratio).
+            self.fitInView(self.zoomStack[-1], Qt.IgnoreAspectRatio)
         else:
-            self.zoomStack = []  # Clear the zoom stack (in case we got here because of an invalid zoom).
-            self.fitInView(self.sceneRect(), self.aspectRatioMode)  # Show entire image (use current aspect ratio mode).
+            self.zoomStack = []
+            self.fitInView(self.sceneRect(), self.aspectRatioMode)
 
     def mouseReleaseEvent(self, event):
         """ Put items on mouse position. 
@@ -167,20 +167,13 @@ class ImageViewerQt(QGraphicsView):
         scenePos = self.mapToScene(event.pos())
 
         if event.button() == Qt.LeftButton:
-            print("mouse event")
             ellipseItem = EllipseItem(self.index, scenePos)
 
             self.scene.addItem(ellipseItem)
             self.itemHistory.append(ellipseItem)
-            print(self.itemHistory)
             self.index += 1
 
-            print(scenePos.x(), scenePos.y())
             self.posArray.append([int(scenePos.x()), int(scenePos.y())])
-
-        elif event.button() == Qt.RightButton:
-            print("right click!!")
-            print(self.posArray)
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -224,6 +217,7 @@ class MainWindow(ImageViewerQt):
     def keyPressEvent(self, event):
         key = event.key()
 
+        # Image Registration
         if key == Qt.Key_R:
             print("R Key is pressed")
             ref_pos = self.referenceView.posArray
@@ -237,13 +231,14 @@ class MainWindow(ImageViewerQt):
                                    self.targetView.fileName,
                                    ref_pos, target_pos)
 
+            self.resize(img.shape[1], img.shape[0])
             self.transformedImage = img
             self.loadImageFromFile(filename)
-            self.resize(img.shape[1], img.shape[0])
             os.remove(filename)
 
         # Press S key. Save a transformed image.
         if key == Qt.Key_S:
+            print("R Key is pressed")
             saveFileName= QFileDialog.getExistingDirectory() + "/result.png"
             print(saveFileName)
             cv2.imwrite(saveFileName, self.transformedImage)
@@ -253,7 +248,8 @@ if __name__ == '__main__':
     import sys
 
     def handleLeftClick(x, y):
-        """Handle mouse cllck event. And print coord."""
+        """Handle mouse cllck event. And print coord.
+        """
         row = int(y)
         column = int(x)
         print("Clicked on image pixel (row="+str(row)+", column="+str(column)+")")
