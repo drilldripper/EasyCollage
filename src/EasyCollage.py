@@ -4,10 +4,10 @@
 import os
 
 
-from PyQt5.QtCore import Qt, QRectF, pyqtSignal
+from PyQt5.QtCore import Qt, QRectF, pyqtSignal, QPoint
 from PyQt5.QtGui import QImage, QPixmap, QBrush
 from PyQt5.QtWidgets import QApplication, QGraphicsView, QGraphicsScene, QFileDialog, \
-    QGraphicsEllipseItem, QGraphicsPixmapItem
+    QGraphicsEllipseItem, QGraphicsPixmapItem,QDesktopWidget
 
 import cv2
 
@@ -197,19 +197,32 @@ class ImageViewerQt(QGraphicsView):
 class MainWindow(ImageViewerQt):
     def __init__(self):
         super().__init__()
-        self.show()
+
+        # Prevent Overlap Window
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        cpp = cp + QPoint(0, -300)
+        qr.moveCenter(cpp)
+        self.move(qr.center())
 
         self.referenceView = ImageViewerQt()
         self.referenceView.loadImageFromFile()  # Pops up file dialog.
         self.referenceView.leftMouseButtonPressed.connect(handleLeftClick)
         self.referenceView.setWindowTitle('Reference Image')
+        cpp = cp + QPoint(-500, 150)
+        qr.moveCenter(cpp)
+        self.referenceView.move(qr.topLeft())
 
         self.targetView = ImageViewerQt()
         self.targetView.loadImageFromFile()  # Pops up file dialog.
         self.targetView.leftMouseButtonPressed.connect(handleLeftClick)
         self.targetView.setWindowTitle('Target Image')
+        cpp = cp + QPoint(500, 150)
+        qr.moveCenter(cpp)
+        self.targetView.move(qr.topLeft())
 
         # Show viewer and run application.
+        self.show()
         self.referenceView.show()
         self.targetView.show()
         sys.exit(app.exec_())
